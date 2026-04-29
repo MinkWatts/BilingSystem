@@ -1,0 +1,144 @@
+﻿@model BillingSystem.Models.DTOs.CreateUserDto
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow p-4">
+
+            <h4 class="text-center mb-4">
+                Create Account
+            </h4>
+
+            @* This shows ALL errors including
+               registration errors *@
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var error in
+                                    ViewData.ModelState.Values
+                                    .SelectMany(v => v.Errors))
+                    {
+                        <p class="mb-0">
+                            @error.ErrorMessage
+                        </p>
+                    }
+                </div>
+            }
+
+            <form asp-controller="Account"
+                  asp-action="Register"
+                  method="post">
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Full Name
+                    </label>
+                    <input asp-for="FullName"
+                           class="form-control"
+                           placeholder="Enter full name" />
+                    <span asp-validation-for="FullName"
+                          class="text-danger small">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Email
+                    </label>
+                    <input asp-for="Email"
+                           class="form-control"
+                           placeholder="Enter email" />
+                    <span asp-validation-for="Email"
+                          class="text-danger small">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Password
+                    </label>
+                    <input asp-for="Password"
+                           type="password"
+                           class="form-control"
+                           placeholder="Enter password" />
+                    <span asp-validation-for="Password"
+                          class="text-danger small">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Confirm Password
+                    </label>
+                    <input type="password"
+                           id="confirmPassword"
+                           class="form-control"
+                           placeholder="Confirm password" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Role
+                    </label>
+                    <select asp-for="Role"
+                            class="form-select">
+                        <option value="">
+                            Select Role
+                        </option>
+                        <option value="Admin">
+                            Admin
+                        </option>
+                        <option value="Agent">
+                            Agent
+                        </option>
+                    </select>
+                    <span asp-validation-for="Role"
+                          class="text-danger small">
+                    </span>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-success w-100">
+                    Register
+                </button>
+
+                <div class="text-center mt-3">
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="text-decoration-none">
+                        Already have account? Login here
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelector('form')
+            .addEventListener('submit', function(e) {
+
+            var password = document
+                .querySelector('[name="Password"]').value;
+
+            var confirm = document
+                .querySelector('#confirmPassword').value;
+
+            if (password !== confirm) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+            }
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync(
+                "_ValidationScriptsPartial");
+    }
+}

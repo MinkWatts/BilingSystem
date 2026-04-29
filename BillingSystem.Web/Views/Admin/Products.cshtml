@@ -1,0 +1,88 @@
+﻿@model List<ProductDto>
+
+@{
+    ViewData["Title"] = "Products";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between
+            align-items-center mb-4">
+    <h4>All Products</h4>
+    <a asp-controller="Admin"
+       asp-action="AddProduct"
+       class="btn btn-primary">
+        + Add New Product
+    </a>
+</div>
+
+<div class="card shadow p-3">
+    <table id="productsTable"
+           class="table table-bordered
+                  table-hover table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>SubCategory</th>
+                <th>Status</th>
+                <th>Created By</th>
+                <th>Created Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int sr = 1;
+                foreach (var product in Model)
+                {
+                    var pId = product.Id;
+                    var pName = product.Name;
+                    var pPrice = product.Price;
+                    var pSub = product.SubCategoryName;
+                    var pActive = product.IsActive;
+                    var pBy = product.CreatedBy;
+                    var pDate = product.CreatedDate
+                    .ToString("dd MMM yyyy");
+
+                    <tr>
+                        <td>@sr</td>
+                        <td>@pName</td>
+                        <td>₹@pPrice</td>
+                        <td>@pSub</td>
+                        <td>
+                            @if (pActive)
+                            {
+                                <span class="badge bg-success">
+                                    Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    Inactive
+                                </span>
+                            }
+                        </td>
+                        <td>@pBy</td>
+                        <td>@pDate</td>
+                    </tr>
+                    sr++;
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#productsTable').DataTable({
+                pageLength: 10,
+                language: {
+                    search: "Search Products:",
+                    lengthMenu: "Show _MENU_ products"
+                }
+            });
+        });
+    </script>
+}

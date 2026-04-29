@@ -1,0 +1,108 @@
+﻿@model List<BillingSystem.Models.DTOs.UserDto>
+
+@{
+    ViewData["Title"] = "Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between
+            align-items-center mb-4">
+    <h4>All Users</h4>
+    <a asp-controller="Admin"
+       asp-action="CreateUser"
+       class="btn btn-primary">
+        + Add New User
+    </a>
+</div>
+
+<div class="card shadow p-3">
+    <table id="usersTable"
+           class="table table-bordered
+                  table-hover table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Created By</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int sr = 1;
+                foreach (var user in Model)
+                {
+                    var userId = user.Id;
+                    var userName = user.FullName;
+                    var userEmail = user.Email;
+                    var userRole = user.Role;
+                    var userCreatedBy = user.CreatedBy;
+                    var userDate = user.CreatedDate
+                    .ToString("dd MMM yyyy");
+
+                    <tr>
+                        <td>@sr</td>
+                        <td>@userName</td>
+                        <td>@userEmail</td>
+                        <td>
+                            @if (userRole == "Admin")
+                            {
+                                <span class="badge bg-danger">
+                                    Admin
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">
+                                    Agent
+                                </span>
+                            }
+                        </td>
+                        <td>@userCreatedBy</td>
+                        <td>@userDate</td>
+                        <td>
+                            <a asp-controller="Admin"
+                               asp-action="EditUser"
+                               asp-route-id="@userId"
+                               class="btn btn-sm btn-warning">
+                                Edit
+                            </a>
+                            <a asp-controller="Admin"
+                               asp-action="DeleteUser"
+                               asp-route-id="@userId"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm(
+                                           'Are you sure?')">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    sr++;
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#usersTable').DataTable({
+                pageLength: 10,
+                language: {
+                    search: "Search Users:",
+                    lengthMenu: "Show _MENU_ users",
+                    info: "Showing _START_ to _END_" +
+                          " of _TOTAL_ users",
+                    paginate: {
+                        next: "Next",
+                        previous: "Previous"
+                    }
+                }
+            });
+        });
+    </script>
+}

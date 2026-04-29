@@ -1,0 +1,28 @@
+﻿@model BillingSystem.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h4 class="mb-4">Dashboard</h4>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card text-white bg-success
+                    p-4 text-center shadow mb-3">
+            <h6>Total Sales</h6>
+            <h2>₹@Model.TotalSales</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-primary
+                    p-4 text-center shadow mb-3">
+            <h6>Total Invoices</h6>
+            <h2>@Model.TotalInvoices</h2>
+        </div>
+    </div>
+
+</div>

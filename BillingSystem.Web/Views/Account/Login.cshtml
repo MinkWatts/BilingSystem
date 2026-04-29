@@ -1,0 +1,277 @@
+﻿@model BillingSystem.Models.DTOs.LoginDto
+
+@{
+    ViewData["Title"] = "Welcome";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        min-height: 40vh;
+        display: flex;
+        align-items: center;
+        border-radius: 16px;
+        margin-bottom: 20px;
+    }
+
+    .login-card {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .welcome-text {
+        color: white;
+    }
+
+        .welcome-text h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .welcome-text p {
+            font-size: 1.2rem;
+            color: #a8b2d8;
+            margin-bottom: 30px;
+        }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        color: #a8b2d8;
+        margin-bottom: 15px;
+        font-size: 1rem;
+    }
+
+    .feature-icon {
+        width: 35px;
+        height: 35px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 16px;
+    }
+
+    .btn-login {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+        }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
+    }
+
+    .divider {
+        height: 1px;
+        background: rgba(255,255,255,0.1);
+        margin: 20px 0;
+    }
+
+    .stat-box {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        color: white;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #a8b2d8;
+    }
+</style>
+
+<div class="hero-section p-4 p-md-5">
+    <div class="container">
+        <div class="row align-items-center g-5">
+
+            <!-- Left Side — Welcome Content -->
+            <div class="col-lg-6 welcome-text">
+
+                <div class="mb-3">
+                    <span style="background:rgba(102,126,234,0.2);
+                                 color:#667eea;
+                                 padding:8px 16px;
+                                 border-radius:99px;
+                                 font-size:14px;
+                                 border:1px solid rgba(102,126,234,0.3)">
+                         Billing Solution
+                    </span>
+                </div>
+
+                <h1>
+                    Welcome to<br />
+                    <span style="color:#667eea">
+                        Billing System
+                    </span>
+                </h1>
+
+                <p>
+                    A complete billing management solution
+                    for your business. Manage users,
+                    products, categories and generate
+                    professional invoices instantly.
+                </p>
+
+                <div class="divider"></div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <span>Manage Users with Role Based Access</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <span>Organize Products by Categories</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <span>Generate Bills and Invoices Instantly</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <span>Print Professional Invoices</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <span>Track Sales on Admin Dashboard</span>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Stats Row -->
+                <div class="row g-3 mt-2">
+                    <div class="col-4">
+                        <div class="stat-box">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">User Roles</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-box">
+                            <div class="stat-number">∞</div>
+                            <div class="stat-label">Products</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-box">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-label">Available</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Side — Login Form -->
+            <div class="col-lg-6">
+                <div class="login-card">
+
+                    <div class="text-center mb-4">
+                        <div style="font-size:48px">💰</div>
+                        <h4 style="font-weight:700;
+                                   color:#1a1a2e">
+                            Sign In
+                        </h4>
+                        <p class="text-muted">
+                            Enter your credentials to continue
+                        </p>
+                    </div>
+
+                    <form asp-controller="Account"
+                          asp-action="Login"
+                          method="post">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Email Address
+                            </label>
+                            <input asp-for="Email"
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter your email" />
+                            <span asp-validation-for="Email"
+                                  class="text-danger small">
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Password
+                            </label>
+                            <input asp-for="Password"
+                                   type="password"
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter your password" />
+                            <span asp-validation-for="Password"
+                                  class="text-danger small">
+                            </span>
+                        </div>
+
+                        <div class="mb-4 form-check">
+                            <input asp-for="RememberMe"
+                                   class="form-check-input" />
+                            <label class="form-check-label text-muted">
+                                Remember Me
+                            </label>
+                        </div>
+
+                        @Html.ValidationSummary(true, "",
+                        new { @class = "text-danger small" })
+
+                        <button type="submit"
+                                class="btn btn-primary
+                                       btn-login w-100
+                                       text-white">
+                            Login to Dashboard
+                        </button>
+
+                        <hr class="my-4" />
+
+                        <div class="text-center">
+                            <span class="text-muted">
+                                Don't have an account?
+                            </span>
+                            <a asp-controller="Account"
+                               asp-action="Register"
+                               class="text-decoration-none fw-semibold"
+                               style="color:#667eea">
+                                Register Here
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync(
+                "_ValidationScriptsPartial");
+    }
+}
