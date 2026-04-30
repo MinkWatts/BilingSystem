@@ -21,5 +21,12 @@ namespace BillingSystem.Web.Controllers
                 .Send(new GetDashboardQuery());
             return View(data);
         }
+
+        public async Task<IActionResult> Reports()
+        {
+            var data = await _mediator
+                .Send(new GetDashboardQuery());
+            return View(data);
+        }
     }
 }

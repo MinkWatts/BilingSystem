@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BillingSystem.Data\BillingSystem.Data.csproj" />
     <ProjectReference Include="..\BillingSystem.Handlers\BillingSystem.Handlers.csproj" />
     <ProjectReference Include="..\BillingSystem.Models\BillingSystem.Models.csproj" />
   </ItemGroup>

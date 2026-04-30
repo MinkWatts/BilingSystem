@@ -5,8 +5,8 @@
         public int Id { get; set; }
 
 
-        public string AgentId { get; set; }
-        public User Agent { get; set; }
+        public string? AgentId { get; set; }
+        public User? Agent { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public decimal TotalAmount { get; set; }
@@ -16,6 +16,6 @@
                 = new List<BillItem>();
 
         // One bill generates one invoice
-        public Invoice Invoice { get; set; }
+        public Invoice? Invoice { get; set; }
     }
 }

@@ -19,48 +19,28 @@
 </style>
 
 <div class="no-print mb-3">
-    <button onclick="window.print()"
-            class="btn btn-primary">
-        🖨 Print Invoice
-    </button>
-    <a asp-controller="Agent"
-       asp-action="GenerateBill"
-       class="btn btn-secondary ms-2">
-        + New Bill
-    </a>
+    <button onclick="window.print()" class="btn btn-primary">🖨 Print Invoice</button>
+    <a asp-controller="Agent" asp-action="GenerateBill" class="btn btn-secondary ms-2">+ New Bill</a>
 </div>
 
-<div class="card shadow p-4"
-     id="invoice-area">
-
-    <!-- Invoice Header -->
-    <div class="d-flex justify-content-between
-                align-items-start mb-4">
+<div class="card shadow p-4" id="invoice-area">
+    <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
-            <h3 class="text-primary">
-                BILLING SYSTEM
-            </h3>
-            <p class="text-muted mb-0">
-                Official Invoice
-            </p>
+            <h3 class="text-primary">BILLING SYSTEM</h3>
+            <p class="text-muted mb-0">Official Invoice</p>
         </div>
         <div class="text-end">
-            <h5 class="mb-1">
-                Invoice #@Model.InvoiceNumber
-            </h5>
+            <h5 class="mb-1">Invoice #@Model.InvoiceNumber</h5>
             <p class="mb-0 text-muted">
-                Date: @Model.GeneratedAt
-                .ToString("dd MMM yyyy")
+                @* FIXED: Wrapped in parentheses *@
+                Date: @(Model.GeneratedAt.ToString("dd MMM yyyy"))
             </p>
-            <p class="mb-0 text-muted">
-                Agent: @Model.AgentName
-            </p>
+            <p class="mb-0 text-muted">Agent: @Model.AgentName</p>
         </div>
     </div>
 
     <hr />
 
-    <!-- Invoice Items Table -->
     <table class="table table-bordered">
         <thead class="table-dark">
             <tr>
@@ -72,8 +52,7 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0;
-                        i < Model.Items.Count; i++)
+            @for (int i = 0; i < Model.Items.Count; i++)
             {
                 <tr>
                     <td>@(i + 1)</td>
@@ -86,25 +65,14 @@
         </tbody>
         <tfoot>
             <tr class="table-success">
-                <td colspan="4"
-                    class="text-end fw-bold">
-                    Grand Total
-                </td>
-                <td class="fw-bold">
-                    ₹@Model.GrandTotal
-                </td>
+                <td colspan="4" class="text-end fw-bold">Grand Total</td>
+                <td class="fw-bold">₹@Model.GrandTotal</td>
             </tr>
         </tfoot>
     </table>
 
-    <!-- Footer -->
-    <div class="text-center mt-4">
-        <p class="text-muted">
-            Thank you for your business!
-        </p>
-        <p class="text-muted small">
-            This is a computer generated invoice.
-        </p>
+    <div class="text-center mt-4 border-top pt-2">
+        <p class="text-primary fw-semibold mb-0">Thank you for your business!</p>
+        <small class="text-muted">Visit us at www.minkwatts-billing.com | Support: +91 12345 67890</small>
     </div>
-
 </div>

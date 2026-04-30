@@ -1,5 +1,4 @@
-﻿using BillingSystem.Handlers.Commands;
-using BillingSystem.Models.DTOs;
+﻿using BillingSystem.Models.DTOs;
 using BillingSystem.Models.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -23,33 +22,33 @@ namespace BillingSystem.Web.Controllers
             _mediator = mediator;
         }
 
-        // ================= LOGIN =================
-
-        // GET: /Account/Login
         public IActionResult Login()
         {
             return View();
         }
 
-        // POST: /Account/Login
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginDto model)
+        public async Task<IActionResult> Login(
+            LoginDto model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
+            var email = model.Email;
+            var password = model.Password;
+            var remember = model.RememberMe;
+
             var result = await _signInManager
                 .PasswordSignInAsync(
-                    model.Email,
-                    model.Password,
-                    model.RememberMe,
-                    false);
+                    email,
+                    password,
+                    remember,
+                    lockoutOnFailure: false);
 
             if (result.Succeeded)
             {
                 var user = await _userManager
-                    .FindByEmailAsync(model.Email);
+                    .FindByEmailAsync(email);
 
                 if (user != null)
                 {
@@ -57,80 +56,96 @@ namespace BillingSystem.Web.Controllers
                         .IsInRoleAsync(user, "Admin");
 
                     if (isAdmin)
-                        return RedirectToAction("Index", "Dashboard");
-                    else
-                        return RedirectToAction("GenerateBill", "Agent");
+                        return RedirectToAction(
+                            "Index", "Dashboard");
+
+                    return RedirectToAction(
+                        "GenerateBill", "Agent");
                 }
             }
 
-            ModelState.AddModelError("", "Invalid email or password");
+            if (result.IsLockedOut)
+            {
+                ModelState.AddModelError("",
+                    "Account is locked out.");
+            }
+            else
+            {
+                ModelState.AddModelError("",
+                    "Invalid email or password.");
+            }
+
             return View(model);
         }
 
-        // ================= REGISTER =================
-
-        // GET: /Account/Register
         public IActionResult Register()
         {
             return View();
         }
 
-        // POST: /Account/Register
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(CreateUserDto model)
+        public async Task<IActionResult> Register(
+            CreateUserDto model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
+            var email = model.Email;
+            var fullName = model.FullName;
+            var password = model.Password;
+            var role = model.Role;
+            var now = DateTime.Now;
+
             var existingUser = await _userManager
-                .FindByEmailAsync(model.Email);
+                .FindByEmailAsync(email);
 
             if (existingUser != null)
             {
                 ModelState.AddModelError("",
-                    "This email is already registered.");
+                    "Email already registered.");
                 return View(model);
             }
 
-            var user = new User
+            var newUser = new User
             {
-                FullName = model.FullName,
-                Email = model.Email,
-                UserName = model.Email,
-                Role = Enum.Parse<BillingSystem.Models.Enums.UserRole>(model.Role),
+                FullName = fullName,
+                Email = email,
+                UserName = email,
+                Role = Enum.Parse<BillingSystem
+                    .Models.Enums.UserRole>(role),
                 CreatedBy = "System",
-                CreatedDate = DateTime.Now
+                CreatedDate = now,
+                EmailConfirmed = true
             };
 
             var result = await _userManager
-                .CreateAsync(user, model.Password);
+                .CreateAsync(newUser, password);
 
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, model.Role);
+                await _userManager
+                    .AddToRoleAsync(newUser, role);
+
+                TempData["Success"] =
+                    "Account created! Please login.";
+
                 return RedirectToAction("Login");
             }
 
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError("", error.Description);
+                ModelState.AddModelError("",
+                    error.Description);
             }
 
             return View(model);
         }
 
-        // ================= LOGOUT =================
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Account");
+            return RedirectToAction("Login");
         }
-
-        // ================= ACCESS DENIED =================
 
         public IActionResult AccessDenied()
         {

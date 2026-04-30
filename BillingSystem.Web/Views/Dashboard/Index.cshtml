@@ -5,24 +5,153 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h4 class="mb-4">Dashboard</h4>
+<div class="container-fluid p-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Admin Dashboard</h4>
+        <span class="text-muted">Last updated: @DateTime.Now.ToString("dd MMM, hh:mm tt")</span>
+    </div>
 
-<div class="row">
+    @* Financial Stats Summary *@
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card text-white bg-success p-4 shadow-sm border-0 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase opacity-75">Total Sales</h6>
+                        <h2 class="display-5 fw-bold">₹@Model.TotalSales</h2>
+                    </div>
+                    <i class="bi bi-currency-rupee fs-1"></i>
+                </div>
+            </div>
+        </div>
 
-    <div class="col-md-4">
-        <div class="card text-white bg-success
-                    p-4 text-center shadow mb-3">
-            <h6>Total Sales</h6>
-            <h2>₹@Model.TotalSales</h2>
+        <div class="col-md-6">
+            <div class="card text-white bg-primary p-4 shadow-sm border-0 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase opacity-75">Total Invoices</h6>
+                        <h2 class="display-5 fw-bold">@Model.TotalInvoices</h2>
+                    </div>
+                    <i class="bi bi-receipt fs-1"></i>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card text-white bg-primary
-                    p-4 text-center shadow mb-3">
-            <h6>Total Invoices</h6>
-            <h2>@Model.TotalInvoices</h2>
+    @* Detailed Counts *@
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 bg-info-subtle p-3 rounded">
+                            <i class="bi bi-people-fill text-info fs-3"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Total Users</h6>
+                            <h3 class="mb-0">@Model.TotalUsers</h3>
+                            <small class="text-muted">
+                                <span class="badge bg-danger-subtle text-danger">@Model.AdminCount Admin</span>
+                                <span class="badge bg-primary-subtle text-primary">@Model.AgentCount Agents</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 bg-warning-subtle p-3 rounded">
+                            <i class="bi bi-box-seam text-warning fs-3"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Total Products</h6>
+                            <h3 class="mb-0">@Model.TotalProducts</h3>
+                            <small class="text-success">Active Inventory</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 bg-secondary-subtle p-3 rounded">
+                            <i class="bi bi-tags-fill text-secondary fs-3"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Categories</h6>
+                            <h3 class="mb-0">@Model.TotalCategories</h3>
+                            <small class="text-muted">Exist in System</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    @* Recent Bills Table *@
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">Recent Bills</h5>
+            <a asp-controller="Dashboard" asp-action="Reports" class="btn btn-sm btn-outline-primary">View All Reports</a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-3">Bill ID</th>
+                            <th>Date</th>
+                            <th>Total Amount</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentBills != null && Model.RecentBills.Any())
+                        {
+                            foreach (var bill in Model.RecentBills)
+                            {
+                                <tr>
+                                    <td class="ps-3 fw-bold">#@bill.Id</td>
+                                    <td>@bill.CreatedDate.ToString("dd MMM yyyy")</td>
+                                    <td class="fw-bold">₹@bill.TotalAmount</td>
+                                    <td class="text-center">
+                                        @* UPDATED ACTION BUTTON *@
+                                        <div class="btn-group" role="group">
+                                            <a asp-controller="Bills"
+                                               asp-action="Details"
+                                               asp-route-id="@bill.Id"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-controller="Bills"
+                                               asp-action="Print"
+                                               asp-route-id="@bill.Id"
+                                               class="btn btn-sm btn-outline-secondary"
+                                               title="Print Invoice">
+                                                <i class="bi bi-printer"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No recent bills found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>

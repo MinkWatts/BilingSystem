@@ -1,0 +1,141 @@
+﻿@model BillingSystem.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "All Reports";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between
+            align-items-center mb-4">
+    <h4>All Reports</h4>
+    <div>
+        <a asp-controller="Dashboard"
+           asp-action="Index"
+           class="btn btn-secondary me-2">
+            Back to Dashboard
+        </a>
+        <button onclick="window.print()"
+                class="btn btn-primary">
+            Print Report
+        </button>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-white p-3
+                    text-center shadow"
+             style="background:linear-gradient(
+                    135deg,#667eea,#764ba2)">
+            <h6>Total Sales</h6>
+            <h3>₹@Model.TotalSales</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white p-3
+                    text-center shadow"
+             style="background:linear-gradient(
+                    135deg,#11998e,#38ef7d)">
+            <h6>Total Invoices</h6>
+            <h3>@Model.TotalInvoices</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white p-3
+                    text-center shadow"
+             style="background:linear-gradient(
+                    135deg,#f093fb,#f5576c)">
+            <h6>Active Products</h6>
+            <h3>@Model.TotalProducts</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white p-3
+                    text-center shadow"
+             style="background:linear-gradient(
+                    135deg,#4facfe,#00f2fe)">
+            <h6>Total Users</h6>
+            <h3>@Model.TotalUsers</h3>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow p-3">
+    <h5 class="mb-3">All Bills Report</h5>
+
+    @if (Model.RecentBills != null
+        && Model.RecentBills.Any())
+    {
+        <table id="reportsTable"
+               class="table table-bordered
+                          table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Bill ID</th>
+                    <th>Invoice No</th>
+                    <th>Agent Name</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int sr = 1;
+                    foreach (var bill in Model.RecentBills)
+                    {
+                        var billId = bill.Id;
+                        var invNo = bill.InvoiceNumber;
+                        var agent = bill.AgentName;
+                        var amt = bill.TotalAmount;
+                        var dt = bill.CreatedDate
+                            .ToString("dd MMM yyyy");
+
+                        <tr>
+                            <td>@sr</td>
+                            <td>
+                                <strong>#@billId</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    @invNo
+                                </span>
+                            </td>
+                            <td>@agent</td>
+                            <td>
+                                <strong>₹@amt</strong>
+                            </td>
+                            <td>@dt</td>
+                        </tr>
+                        sr++;
+                    }
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="text-center py-5 text-muted">
+            <div style="font-size:48px">📋</div>
+            <h5>No Bills Found</h5>
+            <p>
+                Bills will appear here once
+                agents generate them.
+            </p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#reportsTable').DataTable({
+                pageLength: 25,
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ records"
+                }
+            });
+        });
+    </script>
+}

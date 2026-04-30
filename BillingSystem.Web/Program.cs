@@ -57,7 +57,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");
 
-// Seed Roles + First Admin User
+// Seed Roles and First Admin
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider
@@ -84,15 +84,18 @@ using (var scope = app.Services.CreateScope())
 
     if (adminExists == null)
     {
+        var now = DateTime.Now;
+
         var admin = new User
         {
             FullName = "Super Admin",
             Email = adminEmail,
             UserName = adminEmail,
+            EmailConfirmed = true,
             Role = BillingSystem.Models.Enums
                 .UserRole.Admin,
             CreatedBy = "System",
-            CreatedDate = DateTime.Now
+            CreatedDate = now
         };
 
         var result = await userManager

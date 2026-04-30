@@ -1,9 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37012.4 d17.14
+VisualStudioVersion = 17.14.37012.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BillingSystem.Web", "BillingSystem.Web\BillingSystem.Web.csproj", "{FFCD68ED-1D21-47F2-AED7-4DADDD2E6432}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EAF0875A-4105-416A-AD43-EF52882B216A} = {EAF0875A-4105-416A-AD43-EF52882B216A}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BillingSystem.Models", "BillingSystem.Models\BillingSystem.Models.csproj", "{10E73290-AB94-4B4F-88E1-7CAB756A7B5E}"
 EndProject
