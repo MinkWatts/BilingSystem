@@ -5,6 +5,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">Admin Dashboard</h4>
@@ -13,7 +15,7 @@
 
     @* Financial Stats Summary *@
     <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-6 mb-3 mb-md-0">
             <div class="card text-white bg-success p-4 shadow-sm border-0 h-100">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -40,7 +42,7 @@
 
     @* Detailed Counts *@
     <div class="row mb-4">
-        <div class="col-md-4">
+        <div class="col-md-4 mb-3 mb-md-0">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -50,17 +52,13 @@
                         <div class="flex-grow-1 ms-3">
                             <h6 class="text-muted mb-1">Total Users</h6>
                             <h3 class="mb-0">@Model.TotalUsers</h3>
-                            <small class="text-muted">
-                                <span class="badge bg-danger-subtle text-danger">@Model.AdminCount Admin</span>
-                                <span class="badge bg-primary-subtle text-primary">@Model.AgentCount Agents</span>
-                            </small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-4 mb-3 mb-md-0">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -70,7 +68,6 @@
                         <div class="flex-grow-1 ms-3">
                             <h6 class="text-muted mb-1">Total Products</h6>
                             <h3 class="mb-0">@Model.TotalProducts</h3>
-                            <small class="text-success">Active Inventory</small>
                         </div>
                     </div>
                 </div>
@@ -87,7 +84,6 @@
                         <div class="flex-grow-1 ms-3">
                             <h6 class="text-muted mb-1">Categories</h6>
                             <h3 class="mb-0">@Model.TotalCategories</h3>
-                            <small class="text-muted">Exist in System</small>
                         </div>
                     </div>
                 </div>
@@ -106,7 +102,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-3">Bill ID</th>
+                            <th class="ps-4">Bill ID</th>
                             <th>Date</th>
                             <th>Total Amount</th>
                             <th class="text-center">Action</th>
@@ -118,25 +114,27 @@
                             foreach (var bill in Model.RecentBills)
                             {
                                 <tr>
-                                    <td class="ps-3 fw-bold">#@bill.Id</td>
+                                    <td class="ps-4 fw-bold text-primary">#@bill.Id</td>
                                     <td>@bill.CreatedDate.ToString("dd MMM yyyy")</td>
                                     <td class="fw-bold">₹@bill.TotalAmount</td>
                                     <td class="text-center">
-                                        @* UPDATED ACTION BUTTON *@
-                                        <div class="btn-group" role="group">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            @* View Button *@
                                             <a asp-controller="Bills"
                                                asp-action="Details"
                                                asp-route-id="@bill.Id"
                                                class="btn btn-sm btn-outline-primary"
-                                               title="View Details">
-                                                <i class="bi bi-eye"></i>
+                                               title="View">
+                                                <i class="bi bi-eye"></i> View
                                             </a>
+
+                                            @* Print Button *@
                                             <a asp-controller="Bills"
                                                asp-action="Print"
                                                asp-route-id="@bill.Id"
-                                               class="btn btn-sm btn-outline-secondary"
-                                               title="Print Invoice">
-                                                <i class="bi bi-printer"></i>
+                                               class="btn btn-sm btn-outline-dark"
+                                               title="Print">
+                                                <i class="bi bi-printer"></i> Print
                                             </a>
                                         </div>
                                     </td>
