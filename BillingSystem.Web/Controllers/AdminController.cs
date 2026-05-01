@@ -24,8 +24,6 @@ namespace BillingSystem.Web.Controllers
             _db = db;
         }
 
-        // ── LOGIN REDIRECT LOGIC ──────────────────
-        // Add this to your AccountController or Home if Admin hits root while logged in
         [AllowAnonymous]
         public IActionResult Index()
         {
@@ -36,7 +34,7 @@ namespace BillingSystem.Web.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        // ── USERS ────────────────────────────────
+      
 
         public async Task<IActionResult> Users()
         {
@@ -114,7 +112,6 @@ namespace BillingSystem.Web.Controllers
             return RedirectToAction("Users");
         }
 
-        // ── CATEGORIES ───────────────────────────
 
         public async Task<IActionResult> Categories()
         {
@@ -159,7 +156,6 @@ namespace BillingSystem.Web.Controllers
             return RedirectToAction("Categories");
         }
 
-        // ── PRODUCTS ─────────────────────────────
 
         public async Task<IActionResult> Products()
         {

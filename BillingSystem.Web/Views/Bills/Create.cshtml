@@ -1,0 +1,585 @@
+﻿@model BillingSystem.Models.ViewModels.BillViewModel
+
+@{
+    ViewData["Title"] = "Generate Bill";
+}
+
+<style>
+    :root {
+        --primary: #1a3c5e;
+        --accent: #2e7d4f;
+        --light-bg: #f5f7fa;
+        --border: #d0d8e4;
+        --text: #2d3748;
+        --muted: #718096;
+        --white: #ffffff;
+        --shadow: 0 4px 24px rgba(26,60,94,0.10);
+    }
+
+    body {
+        background: var(--light-bg);
+        font-family: 'Segoe UI', sans-serif;
+        color: var(--text);
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 28px 0 20px 0;
+        color: var(--primary);
+    }
+
+    /* ── Step 1: Product Selection ── */
+    .card {
+        background: var(--white);
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    .prod-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .prod-table thead th {
+            background: #1e1e1e;
+            color: var(--white);
+            padding: 14px 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .prod-table tbody tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+            .prod-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            .prod-table tbody tr:nth-child(even) {
+                background: #f9fafb;
+            }
+
+        .prod-table tbody td {
+            padding: 12px 16px;
+            font-size: 0.92rem;
+            vertical-align: middle;
+        }
+
+        .prod-table .td-check {
+            width: 80px;
+            text-align: center;
+        }
+
+        .prod-table .td-qty {
+            width: 140px;
+        }
+
+        /* custom checkbox */
+        .prod-table input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #1a73e8;
+            cursor: pointer;
+        }
+
+    .qty-input {
+        width: 80px;
+        border: 1.5px solid var(--border);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        text-align: center;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .qty-input:focus {
+            border-color: var(--primary);
+        }
+
+        .qty-input:disabled {
+            background: #f0f0f0;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+
+    /* ── Generate Bill button (step 1) ── */
+    .btn-generate {
+        background: var(--accent);
+        color: var(--white);
+        border: none;
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        margin-top: 4px;
+    }
+
+        .btn-generate:hover {
+            opacity: 0.88;
+        }
+
+    /* ── Step 2: Bill Form (hidden until Generate Bill clicked) ── */
+    #billFormSection {
+        display: none;
+        margin-top: 32px;
+    }
+
+    .bill-wrapper {
+        background: var(--white);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .bill-header {
+        background: var(--primary);
+        color: var(--white);
+        padding: 24px 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+        .bill-header .company-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .bill-header .company-sub {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 3px;
+        }
+
+        .bill-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #e8a020;
+            margin: 0;
+        }
+
+        .bill-header .bill-no {
+            font-size: 0.82rem;
+            opacity: 0.85;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+    .bill-body {
+        padding: 28px 32px;
+    }
+
+    .meta-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 28px;
+        margin-bottom: 28px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .form-group label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: var(--muted);
+        }
+
+    .form-control {
+        border: 1.5px solid var(--border);
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 0.92rem;
+        color: var(--text);
+        background: var(--white);
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .form-control[readonly] {
+            background: var(--light-bg);
+        }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 58px;
+    }
+
+    /* ── Selected items table (read-only in step 2) ── */
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 8px;
+    }
+
+        .items-table thead th {
+            background: var(--light-bg);
+            padding: 10px 12px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border);
+            text-align: left;
+        }
+
+        .items-table tbody td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.92rem;
+        }
+
+        .items-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    .td-right {
+        text-align: right;
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    /* ── Totals ── */
+    .totals-box {
+        margin-left: auto;
+        width: 300px;
+        margin-top: 12px;
+    }
+
+    .totals-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.92rem;
+    }
+
+        .totals-row:last-child {
+            border-bottom: none;
+        }
+
+        .totals-row .lbl {
+            color: var(--muted);
+        }
+
+        .totals-row .val {
+            font-weight: 600;
+        }
+
+        .totals-row.grand .lbl,
+        .totals-row.grand .val {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+    .bill-footer {
+        padding: 20px 32px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        border-top: 1px solid var(--border);
+        background: var(--light-bg);
+    }
+
+    .btn {
+        padding: 10px 24px;
+        border-radius: 7px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: opacity 0.2s;
+    }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+
+    .btn-primary {
+        background: var(--primary);
+        color: var(--white);
+    }
+
+    .btn-outline {
+        background: var(--white);
+        color: var(--primary);
+        border: 1.5px solid var(--primary);
+    }
+
+    .btn-print {
+        background: #555;
+        color: var(--white);
+    }
+
+    @@media print {
+        .no-print, .bill-footer {
+            display: none !important;
+        }
+
+        #productSelectSection {
+            display: none !important;
+        }
+
+        #billFormSection {
+            display: block !important;
+        }
+
+        .bill-wrapper {
+            box-shadow: none;
+        }
+    }
+</style>
+
+<!-- ═══════════════════════════════════════════════
+     STEP 1 — Product Selection
+════════════════════════════════════════════════ -->
+<div id="productSelectSection" class="container">
+    <div class="page-title">Generate Bill</div>
+
+    <div class="card">
+        <table class="prod-table">
+            <thead>
+                <tr>
+                    <th class="td-check">Select</th>
+                    <th>Product Name</th>
+                    <th>SubCategory</th>
+                    <th>Price</th>
+                    <th class="td-qty">Quantity</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                @if (ViewBag.Products != null)
+                {
+                    foreach (var p in ViewBag.Products)
+                    {
+                        <tr>
+                            <td class="td-check">
+                                <input type="checkbox" class="prod-check"
+                                       data-id="@p.Id"
+                                       data-name="@p.Name"
+                                       data-subcategory="@p.SubCategoryName"
+                                       data-price="@p.Price"
+                                       onchange="toggleQty(this)" />
+                            </td>
+                            <td>@p.Name</td>
+                            <td>@p.SubCategoryName</td>
+                            <td>₹@p.Price.ToString("N2")</td>
+                            <td class="td-qty">
+                                <input type="number" class="qty-input" value="1" min="1" disabled />
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <button type="button" class="btn-generate" onclick="showBillForm()">Generate Bill</button>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     STEP 2 — Bill Form (shown after Generate Bill)
+════════════════════════════════════════════════ -->
+<div id="billFormSection" class="container">
+    <div class="bill-wrapper">
+
+        <div class="bill-header">
+            <div>
+                <div class="company-name">Your Company Name</div>
+                <div class="company-sub">Address Line, City, State</div>
+            </div>
+            <div>
+                <h2>INVOICE</h2>
+                <div class="bill-no">Bill No: <strong>@ViewBag.NewBillNo</strong></div>
+            </div>
+        </div>
+
+        <form asp-action="Create" method="post" id="mainForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="BillNo" value="@ViewBag.NewBillNo" />
+
+            <div class="bill-body">
+
+                <!-- Customer Details -->
+                <div class="meta-grid">
+                    <div class="form-group">
+                        <label>Bill Date</label>
+                        <input asp-for="BillDate" type="date" class="form-control"
+                               value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Bill No</label>
+                        <input class="form-control" readonly value="@ViewBag.NewBillNo" />
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Name</label>
+                        <input asp-for="CustomerName" class="form-control"
+                               placeholder="Enter customer name" required />
+                        <span asp-validation-for="CustomerName" class="text-danger" style="font-size:.8rem"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Contact</label>
+                        <input asp-for="CustomerContact" class="form-control"
+                               placeholder="Mobile / Phone" maxlength="15" />
+                        <input type="hidden" asp-for="CustomerId" />
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1">
+                        <label>Remarks</label>
+                        <textarea asp-for="Remarks" class="form-control"
+                                  placeholder="Any notes or remarks..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Selected Items (read-only display + hidden inputs) -->
+                <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:10px;">
+                    Bill Items
+                </div>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th style="width:38%">Product Name</th>
+                            <th style="width:20%">SubCategory</th>
+                            <th style="width:12%">Qty</th>
+                            <th style="width:15%">Price (₹)</th>
+                            <th style="width:15%;text-align:right">Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billItemsBody">
+                        <!-- Filled by JS from selected products -->
+                    </tbody>
+                </table>
+
+                <!-- Hidden inputs posted to controller -->
+                <div id="hiddenInputs"></div>
+
+                <!-- Totals -->
+                <div class="totals-box">
+                    <div class="totals-row">
+                        <span class="lbl">Total Amount</span>
+                        <span class="val" id="totalAmt">₹0.00</span>
+                    </div>
+                    <div class="totals-row">
+                        <span class="lbl">Sale Tax (18% GST)</span>
+                        <span class="val" id="taxAmt">₹0.00</span>
+                    </div>
+                    <div class="totals-row grand">
+                        <span class="lbl">Grand Total</span>
+                        <span class="val" id="grandTotal">₹0.00</span>
+                    </div>
+                    <input type="hidden" name="TotalAmount" id="hidTotal" />
+                    <input type="hidden" name="TaxAmount" id="hidTax" />
+                    <input type="hidden" name="GrandTotal" id="hidGrand" />
+                </div>
+
+            </div>
+
+            <div class="bill-footer">
+                <button type="button" class="btn btn-outline no-print"
+                        onclick="document.getElementById('billFormSection').style.display='none';
+                                 document.getElementById('productSelectSection').style.display='block';">
+                    ← Back
+                </button>
+                <button type="button" class="btn btn-print no-print" onclick="window.print()">🖨 Print</button>
+                <button type="submit" class="btn btn-primary">Save Bill</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        const TAX = 0.18;
+
+        // Enable/disable qty input when checkbox toggled
+        function toggleQty(cb) {
+            const row = cb.closest('tr');
+            const qtyInput = row.querySelector('.qty-input');
+            qtyInput.disabled = !cb.checked;
+            if (cb.checked) qtyInput.focus();
+        }
+
+        // Called when "Generate Bill" is clicked
+        function showBillForm() {
+            const checked = document.querySelectorAll('.prod-check:checked');
+            if (checked.length === 0) {
+                alert('Please select at least one product.');
+                return;
+            }
+
+            const tbody        = document.getElementById('billItemsBody');
+            const hiddenInputs = document.getElementById('hiddenInputs');
+            tbody.innerHTML        = '';
+            hiddenInputs.innerHTML = '';
+
+            let total = 0;
+            let idx   = 0;
+
+            checked.forEach(cb => {
+                const row   = cb.closest('tr');
+                const qty   = parseInt(row.querySelector('.qty-input').value) || 1;
+                const price = parseFloat(cb.dataset.price) || 0;
+                const amt   = qty * price;
+                total += amt;
+
+                // Display row
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${cb.dataset.name}</td>
+                        <td>${cb.dataset.subcategory}</td>
+                        <td>${qty}</td>
+                        <td>₹${price.toFixed(2)}</td>
+                        <td class="td-right">₹${amt.toFixed(2)}</td>
+                    </tr>`;
+
+                // Hidden inputs for form POST
+                hiddenInputs.innerHTML += `
+                    <input type="hidden" name="BillItems[${idx}].ProductId"   value="${cb.dataset.id}" />
+                    <input type="hidden" name="BillItems[${idx}].ProductName" value="${cb.dataset.name}" />
+                    <input type="hidden" name="BillItems[${idx}].Qty"         value="${qty}" />
+                    <input type="hidden" name="BillItems[${idx}].Price"       value="${price}" />`;
+                idx++;
+            });
+
+            const tax   = total * TAX;
+            const grand = total + tax;
+
+            document.getElementById('totalAmt').textContent   = '₹' + total.toFixed(2);
+            document.getElementById('taxAmt').textContent     = '₹' + tax.toFixed(2);
+            document.getElementById('grandTotal').textContent = '₹' + grand.toFixed(2);
+            document.getElementById('hidTotal').value = total.toFixed(2);
+            document.getElementById('hidTax').value   = tax.toFixed(2);
+        ``    document.getElementById('hidGrand').value = grand.toFixed(2);
+
+            // Show bill form, hide product selection
+            document.getElementById('productSelectSection').style.display = 'none';
+            document.getElementById('billFormSection').style.display      = 'block';
+        }
+    </script>
+}

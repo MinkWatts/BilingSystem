@@ -1,5 +1,4 @@
 ﻿@model BillingSystem.Models.DTOs.InvoiceDto
-
 @{
     ViewData["Title"] = "Invoice";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -24,23 +23,47 @@
 </div>
 
 <div class="card shadow p-4" id="invoice-area">
-    <div class="d-flex justify-content-between align-items-start mb-4">
+
+    <!-- Invoice Header -->
+    <div class="d-flex justify-content-between align-items-start mb-3">
         <div>
-            <h3 class="text-primary">BILLING SYSTEM</h3>
+            <h3 class="text-primary fw-bold">BILLING SYSTEM</h3>
             <p class="text-muted mb-0">Official Invoice</p>
         </div>
         <div class="text-end">
             <h5 class="mb-1">Invoice #@Model.InvoiceNumber</h5>
-            <p class="mb-0 text-muted">
-                @* FIXED: Wrapped in parentheses *@
-                Date: @(Model.GeneratedAt.ToString("dd MMM yyyy"))
-            </p>
+            <p class="mb-0 text-muted">Date: @(Model.GeneratedAt.ToString("dd MMM yyyy"))</p>
             <p class="mb-0 text-muted">Agent: @Model.AgentName</p>
         </div>
     </div>
 
     <hr />
 
+    <!-- Customer Details -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h6 class="text-uppercase text-muted fw-bold mb-2" style="font-size:0.75rem;letter-spacing:1px">
+                Bill To
+            </h6>
+            <p class="mb-1 fw-semibold fs-5">@Model.CustomerName</p>
+            <p class="mb-1 text-muted">📞 @Model.CustomerContact</p>
+            @if (!string.IsNullOrEmpty(Model.Remarks))
+            {
+                <p class="mb-0 text-muted fst-italic">📝 @Model.Remarks</p>
+            }
+        </div>
+        <div class="col-md-6 text-md-end">
+            <h6 class="text-uppercase text-muted fw-bold mb-2" style="font-size:0.75rem;letter-spacing:1px">
+                Invoice Details
+            </h6>
+            <p class="mb-1"><span class="text-muted">Invoice No:</span> <strong>@Model.InvoiceNumber</strong></p>
+            <p class="mb-1"><span class="text-muted">Date:</span> @(Model.GeneratedAt.ToString("dd MMM yyyy"))</p>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- Items Table -->
     <table class="table table-bordered">
         <thead class="table-dark">
             <tr>
@@ -58,21 +81,30 @@
                     <td>@(i + 1)</td>
                     <td>@Model.Items[i].ProductName</td>
                     <td>@Model.Items[i].Quantity</td>
-                    <td>₹@Model.Items[i].UnitPrice</td>
-                    <td>₹@Model.Items[i].LineTotal</td>
+                    <td>₹@Model.Items[i].UnitPrice.ToString("N2")</td>
+                    <td>₹@Model.Items[i].LineTotal.ToString("N2")</td>
                 </tr>
             }
         </tbody>
         <tfoot>
+            <tr>
+                <td colspan="4" class="text-end text-muted">Total Amount</td>
+                <td>₹@((Model.GrandTotal / 1.18m).ToString("N2"))</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-end text-muted">Sale Tax (18% GST)</td>
+                <td>₹@((Model.GrandTotal - Model.GrandTotal / 1.18m).ToString("N2"))</td>
+            </tr>
             <tr class="table-success">
                 <td colspan="4" class="text-end fw-bold">Grand Total</td>
-                <td class="fw-bold">₹@Model.GrandTotal</td>
+                <td class="fw-bold">₹@Model.GrandTotal.ToString("N2")</td>
             </tr>
         </tfoot>
     </table>
 
-    <div class="text-center mt-4 border-top pt-2">
+    <div class="text-center mt-4 border-top pt-3">
         <p class="text-primary fw-semibold mb-0">Thank you for your business!</p>
         <small class="text-muted">Visit us at www.minkwatts-billing.com | Support: +91 12345 67890</small>
     </div>
+
 </div>

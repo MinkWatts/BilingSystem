@@ -30,7 +30,6 @@ namespace BillingSystem.Handlers.Queries
                 var totalProducts = await _db.Products.CountAsync(cancellationToken);
                 var totalCategories = await _db.Categories.CountAsync(cancellationToken);
 
-                // 2. Fetch and Map Recent Bills (Crucial Fix for CS0029)
                 var recentBills = await _db.Bills
                     .Include(b => b.Invoice)
                     .OrderByDescending(b => b.CreatedAt)

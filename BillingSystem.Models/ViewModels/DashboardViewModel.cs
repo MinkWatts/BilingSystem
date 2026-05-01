@@ -20,7 +20,7 @@ namespace BillingSystem.Models.ViewModels
         public int Id { get; set; }
         public string AgentName { get; set; } = string.Empty;
         public decimal TotalAmount { get; set; }
-        public DateTime CreatedDate { get; set; } // Fixed name
+        public DateTime CreatedDate { get; set; } 
         public string InvoiceNumber { get; set; } = string.Empty;
     }
 }

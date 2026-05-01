@@ -45,14 +45,20 @@ namespace BillingSystem.Handlers.Queries
                     AgentName = invoice.Bill.Agent.FullName,
                     GeneratedAt = invoice.GeneratedAt,
                     GrandTotal = invoice.Bill.TotalAmount,
+
+                    
+                    CustomerName = invoice.Bill.CustomerName,
+                    CustomerContact = invoice.Bill.CustomerContact,
+                    Remarks = invoice.Bill.Remarks,
+
                     Items = invoice.Bill.Items
-                        .Select(i => new InvoiceItemDto
-                        {
-                            ProductName = i.Product.Name,
-                            Quantity = i.Quantity,
-                            UnitPrice = i.UnitPrice,
-                            LineTotal = i.Quantity * i.UnitPrice
-                        }).ToList()
+         .Select(i => new InvoiceItemDto
+         {
+             ProductName = i.Product.Name,
+             Quantity = i.Quantity,
+             UnitPrice = i.UnitPrice,
+             LineTotal = i.Quantity * i.UnitPrice
+         }).ToList()
                 };
             }
             catch (Exception ex)

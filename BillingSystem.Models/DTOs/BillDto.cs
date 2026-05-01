@@ -7,11 +7,17 @@
         public string AgentName { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public decimal TotalAmount { get; set; }
+
+     
+        public string CustomerName { get; set; } = string.Empty;
+        public string? CustomerContact { get; set; }
+        public string? Remarks { get; set; }
+
         public List<BillItemDto> Items { get; set; }
             = new List<BillItemDto>();
     }
 
-    // One row inside a bill
+
     public class BillItemDto
     {
         public int ProductId { get; set; }
@@ -21,11 +27,17 @@
         public decimal LineTotal { get; set; }
     }
 
-    // Used when CREATING a bill
+   
     public class CreateBillDto
     {
         public string AgentId { get; set; } = string.Empty;
         public string CreatedBy { get; set; } = string.Empty;
+
+        
+        public string CustomerName { get; set; } = string.Empty;
+        public string? CustomerContact { get; set; }
+        public string? Remarks { get; set; }
+
         public List<BillItemDto> Items { get; set; }
             = new List<BillItemDto>();
     }

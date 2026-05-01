@@ -49,11 +49,15 @@ namespace BillingSystem.Handlers.Commands
                 var bill = new Bill
                 {
                     AgentId = request.BillDto.AgentId,
-                    TotalAmount = billItems
-                        .Sum(x => x.UnitPrice * x.Quantity),
+                    TotalAmount = billItems.Sum(x => x.UnitPrice * x.Quantity),
                     Items = billItems,
                     CreatedBy = request.BillDto.CreatedBy,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTime.Now,
+
+                    // ── Customer details ──
+                    CustomerName = request.BillDto.CustomerName,
+                    CustomerContact = request.BillDto.CustomerContact,
+                    Remarks = request.BillDto.Remarks
                 };
 
                 _db.Bills.Add(bill);
