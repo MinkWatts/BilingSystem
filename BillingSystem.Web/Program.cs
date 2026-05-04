@@ -75,7 +75,6 @@ using (var scope = app.Services.CreateScope())
                 new IdentityRole(role));
     }
 
-    // Create First Admin
     string adminEmail = "admin@billing.com";
     string adminPassword = "admin123";
 

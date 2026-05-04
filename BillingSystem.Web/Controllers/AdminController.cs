@@ -32,7 +32,7 @@ namespace BillingSystem.Web.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        // ── USERS ────────────────────────────────
+        // ── USERS ─
 
         public async Task<IActionResult> Users()
         {
@@ -139,7 +139,7 @@ namespace BillingSystem.Web.Controllers
             return RedirectToAction("Users");
         }
 
-        // ── CATEGORIES ───────────────────────────
+        // ── CATEGORIES ──
 
         public async Task<IActionResult> Categories()
         {
@@ -219,7 +219,7 @@ namespace BillingSystem.Web.Controllers
             return RedirectToAction("Categories");
         }
 
-        // ── PRODUCTS ─────────────────────────────
+        // ── PRODUCTS ──
 
         public async Task<IActionResult> Products()
         {

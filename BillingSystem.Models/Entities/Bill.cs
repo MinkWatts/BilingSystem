@@ -8,7 +8,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public decimal TotalAmount { get; set; }
 
-        // ── ADD THESE 3 ──
+        
         public string CustomerName { get; set; } = string.Empty;
         public string? CustomerContact { get; set; }
         public string? Remarks { get; set; }
