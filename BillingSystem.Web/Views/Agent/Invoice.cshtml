@@ -1,110 +1,942 @@
-﻿@model BillingSystem.Models.DTOs.InvoiceDto
+﻿@model BillingSystem.Models.DTOs.InvoiceDto?
+@using System.Security.Claims
 @{
-    ViewData["Title"] = "Invoice";
+    ViewData["Title"] = Model != null ? "Invoice #" + Model.InvoiceNumber : "New Invoice";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isSaved = Model != null;
+    string agentEmail = User.FindFirst(ClaimTypes.Email)?.Value ?? "Agent";
 }
 
 <style>
-    @@media print {
-        .no-print {
-            display: none;
+    .inv-page {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f1f5f9;
+    }
+
+    .inv-topbar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .inv-btn {
+        padding: 9px 20px;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .inv-btn-primary {
+        background: #1a56db;
+        color: #fff;
+    }
+
+        .inv-btn-primary:hover {
+            background: #1240a0;
+            color: #fff;
+            text-decoration: none;
         }
 
-        .card {
+    .inv-btn-outline {
+        background: #fff;
+        color: #334155;
+        border: 1.5px solid #cbd5e1;
+    }
+
+        .inv-btn-outline:hover {
+            border-color: #1a56db;
+            color: #1a56db;
+            text-decoration: none;
+        }
+
+    .inv-card {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+        overflow: hidden;
+        max-width: 1080px;
+        margin: 0 auto 40px;
+    }
+
+    /* Header */
+    .inv-header {
+        background: linear-gradient(120deg, #0f172a 60%, #1e3a8a 100%);
+        padding: 30px 36px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .inv-brand {
+        color: #fff;
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin: 0 0 4px;
+        letter-spacing: -0.03em;
+    }
+
+    .inv-brand-sub {
+        color: rgba(255,255,255,0.45);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    .inv-meta {
+        text-align: right;
+    }
+
+    .inv-badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.10);
+        color: #fbbf24;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 3px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(251,191,36,0.35);
+        margin-bottom: 8px;
+    }
+
+    .inv-num {
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+        margin: 0 0 4px;
+    }
+
+    .inv-meta-info {
+        color: rgba(255,255,255,0.50);
+        font-size: 0.78rem;
+        margin: 2px 0;
+    }
+
+    /* Body */
+    .inv-body {
+        padding: 32px 36px;
+    }
+
+    .inv-section-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin-bottom: 10px;
+    }
+
+    /* Customer grid */
+    .inv-cust-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 28px;
+    }
+
+    .inv-field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .inv-field label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+
+        .inv-field input {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 9px 13px;
+            font-size: 0.9rem;
+            color: #0f172a;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            width: 100%;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+            .inv-field input:focus {
+                border-color: #1a56db;
+                box-shadow: 0 0 0 3px rgba(26,86,219,0.10);
+            }
+
+            .inv-field input::placeholder {
+                color: #cbd5e1;
+            }
+
+    .inv-divider {
+        height: 1px;
+        background: #e2e8f0;
+        margin: 0 0 26px;
+    }
+
+    /* Table */
+    .inv-table-wrap {
+        border-radius: 8px;
+        border: 1.5px solid #e2e8f0;
+        overflow: hidden;
+        margin-bottom: 14px;
+    }
+
+    .inv-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+        .inv-table thead tr {
+            background: #0f172a;
+        }
+
+        .inv-table thead th {
+            color: rgba(255,255,255,0.65);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.11em;
+            text-transform: uppercase;
+            padding: 13px 14px;
             border: none;
-            box-shadow: none;
+            white-space: nowrap;
+        }
+
+            .inv-table thead th.th-num {
+                width: 44px;
+                text-align: center;
+            }
+
+            .inv-table thead th.th-prod {
+                min-width: 260px;
+            }
+
+            .inv-table thead th.th-cat {
+                width: 150px;
+            }
+
+            .inv-table thead th.th-qty {
+                width: 80px;
+                text-align: center;
+            }
+
+            .inv-table thead th.th-price {
+                width: 110px;
+                text-align: right;
+            }
+
+            .inv-table thead th.th-amt {
+                width: 120px;
+                text-align: right;
+            }
+
+            .inv-table thead th.th-del {
+                width: 48px;
+                text-align: center;
+            }
+
+        .inv-table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.1s;
+        }
+
+            .inv-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            .inv-table tbody tr:hover {
+                background: #f8fafc;
+            }
+
+        .inv-table tbody td {
+            padding: 11px 14px;
+            vertical-align: middle;
+            border: none;
+            color: #0f172a;
+        }
+
+            .inv-table tbody td.td-num {
+                text-align: center;
+                color: #94a3b8;
+                font-size: 0.78rem;
+                font-weight: 700;
+            }
+
+            .inv-table tbody td.td-price {
+                text-align: right;
+                font-family: 'Courier New', monospace;
+                color: #64748b;
+            }
+
+            .inv-table tbody td.td-amt {
+                text-align: right;
+                font-family: 'Courier New', monospace;
+                font-weight: 700;
+                color: #0f172a;
+            }
+
+            .inv-table tbody td.td-del {
+                text-align: center;
+            }
+
+    .inv-select {
+        width: 100%;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 7px 30px 7px 10px;
+        font-size: 0.875rem;
+        color: #0f172a;
+        background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 9px center;
+        -webkit-appearance: none;
+        appearance: none;
+        outline: none;
+        cursor: pointer;
+        transition: border-color 0.15s;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+        .inv-select:focus {
+            border-color: #1a56db;
+            box-shadow: 0 0 0 3px rgba(26,86,219,0.10);
+        }
+
+    .cat-pill {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        background: #e8f0fe;
+        color: #1a56db;
+    }
+
+        .cat-pill.empty {
+            background: #f1f5f9;
+            color: #94a3b8;
+        }
+
+    .qty-box {
+        width: 64px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 7px 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-align: center;
+        outline: none;
+        font-family: 'Courier New', monospace;
+        margin: 0 auto;
+        display: block;
+        transition: border-color 0.15s;
+    }
+
+        .qty-box:focus {
+            border-color: #1a56db;
+            box-shadow: 0 0 0 3px rgba(26,86,219,0.10);
+        }
+
+    .del-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: #fde8e8;
+        color: #e02424;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+        transition: all 0.15s;
+        margin: 0 auto;
+    }
+
+        .del-btn:hover {
+            background: #e02424;
+            color: #fff;
+        }
+
+    .add-row-btn {
+        width: 100%;
+        padding: 11px;
+        border: 2px dashed #cbd5e1;
+        border-radius: 8px;
+        background: transparent;
+        color: #1a56db;
+        font-size: 0.875rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.18s;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+        .add-row-btn:hover {
+            background: #e8f0fe;
+            border-color: #1a56db;
+        }
+
+    /* Totals */
+    .inv-totals-wrap {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 24px;
+    }
+
+    .inv-totals {
+        background: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 18px 26px;
+        min-width: 300px;
+    }
+
+    .tot-line {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+    }
+
+        .tot-line .lbl {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .tot-line .val {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+    .tot-sep {
+        height: 1px;
+        background: #e2e8f0;
+        margin: 10px 0;
+    }
+
+    .tot-grand {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0 0;
+    }
+
+        .tot-grand .lbl {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #1a56db;
+        }
+
+        .tot-grand .val {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #1a56db;
+        }
+
+    /* Save btn */
+    .inv-save-wrap {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 28px;
+    }
+
+    .save-btn {
+        background: linear-gradient(135deg, #057a55, #0a9466);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 13px 36px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(5,122,85,0.30);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.18s;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(5,122,85,0.40);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+    /* Footer */
+    .inv-footer {
+        border-top: 1px solid #e2e8f0;
+        background: #f8fafc;
+        padding: 18px 36px;
+        text-align: center;
+    }
+
+        .inv-footer p {
+            margin: 0 0 3px;
+            color: #1a56db;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .inv-footer small {
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+
+    /* Saved view specific */
+    .saved-cust-box {
+        margin-bottom: 26px;
+    }
+
+    .saved-cust-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0 0 4px;
+    }
+
+    .saved-cust-info {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin: 2px 0;
+    }
+
+    .saved-cust-remark {
+        color: #94a3b8;
+        font-style: italic;
+        font-size: 0.85rem;
+        margin: 2px 0;
+    }
+
+    .inv-detail-label {
+        color: #94a3b8;
+    }
+
+    .inv-detail-val {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+    }
+
+    /* Toast */
+    #inv-toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 11px 20px;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+        z-index: 9999;
+        display: none;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    @@media print {
+        .no-print {
+            display: none !important;
+        }
+
+        .inv-card {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+
+        .inv-header {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+
+    @@media (max-width: 700px) {
+        .inv-cust-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .inv-header {
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .inv-meta {
+            text-align: left;
+        }
+
+        .inv-body {
+            padding: 20px 16px;
+        }
+
+        .inv-totals {
+            min-width: unset;
+            width: 100%;
         }
     }
 </style>
 
-<div class="no-print mb-3">
-    <button onclick="window.print()" class="btn btn-primary">🖨 Print Invoice</button>
-    <a asp-controller="Agent" asp-action="GenerateBill" class="btn btn-secondary ms-2">+ New Bill</a>
+<div class="inv-page">
+
+    <div class="inv-topbar no-print">
+        @if (isSaved)
+        {
+            <button onclick="window.print()" class="inv-btn inv-btn-primary">&#128424; Print Invoice</button>
+            <a asp-controller="Agent" asp-action="Invoice" class="inv-btn inv-btn-outline">+ New Bill</a>
+        }
+        else
+        {
+            <button onclick="window.print()" class="inv-btn inv-btn-outline">&#128424; Print Preview</button>
+        }
+    </div>
+
+    <div class="inv-card" id="invoice-area">
+
+        <div class="inv-header">
+            <div>
+                <p class="inv-brand">BILLING SYSTEM</p>
+                <p class="inv-brand-sub">Official Invoice</p>
+            </div>
+            <div class="inv-meta">
+                <div class="inv-badge">INVOICE</div>
+                @if (isSaved)
+                {
+                    <p class="inv-num"># @Model!.InvoiceNumber</p>
+                    <p class="inv-meta-info">&#128197; @Model.GeneratedAt.ToString("dd MMM yyyy")</p>
+                    <p class="inv-meta-info">&#128100; @Model.AgentName</p>
+                }
+                else
+                {
+                    <p class="inv-num"># AUTO</p>
+                    <p class="inv-meta-info">&#128197; @DateTime.Now.ToString("dd MMM yyyy")</p>
+                    <p class="inv-meta-info">&#128100; @agentEmail</p>
+                }
+            </div>
+        </div>
+
+        <div class="inv-body">
+
+            @if (isSaved)
+            {
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+                    <div class="saved-cust-box">
+                        <div class="inv-section-label">Bill To</div>
+                        <p class="saved-cust-name">@Model!.CustomerName</p>
+                        <p class="saved-cust-info">&#128222; @Model.CustomerContact</p>
+                        @if (!string.IsNullOrEmpty(Model.Remarks))
+                        {
+                            <p class="saved-cust-remark">&#128221; @Model.Remarks</p>
+                        }
+                    </div>
+                    <div style="text-align:right">
+                        <div class="inv-section-label">Invoice Details</div>
+                        <p style="margin:0 0 4px;font-size:0.875rem">
+                            <span class="inv-detail-label">Invoice No: </span>
+                            <span class="inv-detail-val">@Model!.InvoiceNumber</span>
+                        </p>
+                        <p style="margin:0;color:#64748b;font-size:0.85rem">
+                            @Model.GeneratedAt.ToString("dd MMMM yyyy")
+                        </p>
+                    </div>
+                </div>
+
+                <div class="inv-divider"></div>
+
+                <div class="inv-table-wrap">
+                    <table class="inv-table">
+                        <thead>
+                            <tr>
+                                <th class="th-num">#</th>
+                                <th class="th-prod">Product Name</th>
+                                <th class="th-cat">Sub Category</th>
+                                <th class="th-qty" style="text-align:center">Qty</th>
+                                <th class="th-price" style="text-align:right">Unit Price</th>
+                                <th class="th-amt" style="text-align:right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model!.Items.Count; i++)
+                            {
+                                <tr>
+                                    <td class="td-num">@(i + 1)</td>
+                                    <td style="font-weight:600">@Model.Items[i].ProductName</td>
+                                    <td><span class="cat-pill">—</span></td>
+                                    <td style="text-align:center;font-family:'Courier New',monospace;font-weight:600">@Model.Items[i].Quantity</td>
+                                    <td class="td-price">&#8377;@Model.Items[i].UnitPrice.ToString("N2")</td>
+                                    <td class="td-amt">&#8377;@Model.Items[i].LineTotal.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr style="border-top:1.5px solid #e2e8f0">
+                                <td colspan="5" style="text-align:right;padding:10px 14px;color:#64748b;font-size:0.85rem">Total Amount</td>
+                                <td style="padding:10px 14px;text-align:right;font-family:'Courier New',monospace;font-weight:600">&#8377;@((Model!.GrandTotal / 1.18m).ToString("N2"))</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="text-align:right;padding:8px 14px;color:#64748b;font-size:0.85rem">GST (18%)</td>
+                                <td style="padding:8px 14px;text-align:right;font-family:'Courier New',monospace;font-weight:600">&#8377;@((Model.GrandTotal - Model.GrandTotal / 1.18m).ToString("N2"))</td>
+                            </tr>
+                            <tr style="background:#e8f0fe">
+                                <td colspan="5" style="text-align:right;padding:12px 14px;font-weight:800;color:#1a56db;font-size:1rem">Grand Total</td>
+                                <td style="padding:12px 14px;text-align:right;font-family:'Courier New',monospace;font-weight:800;color:#1a56db;font-size:1rem">&#8377;@Model.GrandTotal.ToString("N2")</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="inv-cust-grid">
+                    <div class="inv-field">
+                        <label>Customer Name *</label>
+                        <input type="text" id="customerName" placeholder="Enter customer name" autocomplete="off" />
+                    </div>
+                    <div class="inv-field">
+                        <label>Customer Contact</label>
+                        <input type="text" id="customerContact" placeholder="Mobile / Phone" />
+                    </div>
+                    <div class="inv-field">
+                        <label>Bill Date</label>
+                        <input type="date" id="billDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="inv-field">
+                        <label>Remarks</label>
+                        <input type="text" id="remarks" placeholder="Any notes..." />
+                    </div>
+                </div>
+
+                <div class="inv-divider"></div>
+
+                <div class="inv-section-label" style="margin-bottom:12px">Bill Items</div>
+
+                <div class="inv-table-wrap">
+                    <table class="inv-table">
+                        <thead>
+                            <tr>
+                                <th class="th-num">#</th>
+                                <th class="th-prod">Product Name</th>
+                                <th class="th-cat">Sub Category</th>
+                                <th class="th-qty">Qty</th>
+                                <th class="th-price">Price (&#8377;)</th>
+                                <th class="th-amt">Amount (&#8377;)</th>
+                                <th class="th-del no-print"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="billBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="button" class="add-row-btn no-print" onclick="addRow()">
+                    &#43; Add Item
+                </button>
+
+                <div class="inv-totals-wrap">
+                    <div class="inv-totals">
+                        <div class="tot-line">
+                            <span class="lbl">Total Amount</span>
+                            <span class="val" id="totalAmount">&#8377;0.00</span>
+                        </div>
+                        <div class="tot-line">
+                            <span class="lbl">Sale Tax (18% GST)</span>
+                            <span class="val" id="gstAmount">&#8377;0.00</span>
+                        </div>
+                        <div class="tot-sep"></div>
+                        <div class="tot-grand">
+                            <span class="lbl">Grand Total</span>
+                            <span class="val" id="grandTotal">&#8377;0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inv-save-wrap no-print">
+                    <button type="button" class="save-btn" id="saveBtn" onclick="saveBill()">
+                        &#128190; Save Bill
+                    </button>
+                </div>
+            }
+
+        </div>
+
+        <div class="inv-footer">
+            <p>Thank you for your business! &#127881;</p>
+            <small>Support: +91 12345 67890 &nbsp;|&nbsp; billing-system.com</small>
+        </div>
+
+    </div>
 </div>
 
-<div class="card shadow p-4" id="invoice-area">
+<div id="inv-toast"></div>
 
-    <!-- Invoice Header -->
-    <div class="d-flex justify-content-between align-items-start mb-3">
-        <div>
-            <h3 class="text-primary fw-bold">BILLING SYSTEM</h3>
-            <p class="text-muted mb-0">Official Invoice</p>
-        </div>
-        <div class="text-end">
-            <h5 class="mb-1">Invoice #@Model.InvoiceNumber</h5>
-            <p class="mb-0 text-muted">Date: @(Model.GeneratedAt.ToString("dd MMM yyyy"))</p>
-            <p class="mb-0 text-muted">Agent: @Model.AgentName</p>
-        </div>
-    </div>
+@if (!isSaved)
+{
+    <script>
+        var products = [];
+        var rowCount = 0;
 
-    <hr />
-
-    <!-- Customer Details -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <h6 class="text-uppercase text-muted fw-bold mb-2" style="font-size:0.75rem;letter-spacing:1px">
-                Bill To
-            </h6>
-            <p class="mb-1 fw-semibold fs-5">@Model.CustomerName</p>
-            <p class="mb-1 text-muted">📞 @Model.CustomerContact</p>
-            @if (!string.IsNullOrEmpty(Model.Remarks))
-            {
-                <p class="mb-0 text-muted fst-italic">📝 @Model.Remarks</p>
+        async function loadProducts() {
+            try {
+                var res = await fetch('/Agent/GetProducts');
+                if (!res.ok) { showToast('Failed to load products. Refresh page.', true); return; }
+                products = await res.json();
+                addRow();
+            } catch (e) {
+                showToast('Failed to load products. Refresh page.', true);
             }
-        </div>
-        <div class="col-md-6 text-md-end">
-            <h6 class="text-uppercase text-muted fw-bold mb-2" style="font-size:0.75rem;letter-spacing:1px">
-                Invoice Details
-            </h6>
-            <p class="mb-1"><span class="text-muted">Invoice No:</span> <strong>@Model.InvoiceNumber</strong></p>
-            <p class="mb-1"><span class="text-muted">Date:</span> @(Model.GeneratedAt.ToString("dd MMM yyyy"))</p>
-        </div>
-    </div>
+        }
 
-    <hr />
-
-    <!-- Items Table -->
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Product Name</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.Items.Count; i++)
-            {
-                <tr>
-                    <td>@(i + 1)</td>
-                    <td>@Model.Items[i].ProductName</td>
-                    <td>@Model.Items[i].Quantity</td>
-                    <td>₹@Model.Items[i].UnitPrice.ToString("N2")</td>
-                    <td>₹@Model.Items[i].LineTotal.ToString("N2")</td>
-                </tr>
+        function addRow() {
+            rowCount++;
+            var id = rowCount;
+            var opts = '<option value="">-- Select Product --</option>';
+            for (var i = 0; i < products.length; i++) {
+                var p = products[i];
+                if (p.isActive) {
+                    opts += '<option value="' + p.id + '" data-price="' + p.price + '" data-cat="' + p.subCategoryName + '">' + p.name + '</option>';
+                }
             }
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="4" class="text-end text-muted">Total Amount</td>
-                <td>₹@((Model.GrandTotal / 1.18m).ToString("N2"))</td>
-            </tr>
-            <tr>
-                <td colspan="4" class="text-end text-muted">Sale Tax (18% GST)</td>
-                <td>₹@((Model.GrandTotal - Model.GrandTotal / 1.18m).ToString("N2"))</td>
-            </tr>
-            <tr class="table-success">
-                <td colspan="4" class="text-end fw-bold">Grand Total</td>
-                <td class="fw-bold">₹@Model.GrandTotal.ToString("N2")</td>
-            </tr>
-        </tfoot>
-    </table>
+            var tr = document.createElement('tr');
+            tr.id = 'row' + id;
+            tr.innerHTML =
+                '<td class="td-num">' + id + '</td>' +
+                '<td><select class="inv-select" id="prod' + id + '" onchange="fillDetails(' + id + ')">' + opts + '</select></td>' +
+                '<td id="cat' + id + '"><span class="cat-pill empty">\u2014</span></td>' +
+                '<td style="text-align:center"><input type="number" class="qty-box" id="qty' + id + '" value="1" min="1" oninput="calcAmt(' + id + ')" onchange="calcAmt(' + id + ')" /></td>' +
+                '<td class="td-price" id="price' + id + '">0.00</td>' +
+                '<td class="td-amt" id="amt' + id + '">0.00</td>' +
+                '<td class="td-del no-print"><button type="button" class="del-btn" onclick="removeRow(' + id + ')">\u2715</button></td>';
+            document.getElementById('billBody').appendChild(tr);
+        }
 
-    <div class="text-center mt-4 border-top pt-3">
-        <p class="text-primary fw-semibold mb-0">Thank you for your business!</p>
-        <small class="text-muted">Visit us at www.minkwatts-billing.com | Support: +91 12345 67890</small>
-    </div>
+        function fillDetails(id) {
+            var sel = document.getElementById('prod' + id);
+            var opt = sel.options[sel.selectedIndex];
+            var catEl = document.getElementById('cat' + id);
+            if (!opt || !opt.value) {
+                catEl.innerHTML = '<span class="cat-pill empty">\u2014</span>';
+                document.getElementById('price' + id).textContent = '0.00';
+                document.getElementById('amt' + id).textContent = '0.00';
+                updateTotals(); return;
+            }
+            var price = parseFloat(opt.getAttribute('data-price')) || 0;
+            var cat = opt.getAttribute('data-cat') || '\u2014';
+            catEl.innerHTML = '<span class="cat-pill">' + cat + '</span>';
+            document.getElementById('price' + id).textContent = price.toFixed(2);
+            calcAmt(id);
+        }
 
-</div>
+        function calcAmt(id) {
+            var qty = parseFloat(document.getElementById('qty' + id).value) || 0;
+            var price = parseFloat(document.getElementById('price' + id).textContent) || 0;
+            document.getElementById('amt' + id).textContent = (qty * price).toFixed(2);
+            updateTotals();
+        }
+
+        function removeRow(id) {
+            var row = document.getElementById('row' + id);
+            if (row) { row.remove(); updateTotals(); }
+        }
+
+        function updateTotals() {
+            var total = 0;
+            var cells = document.querySelectorAll('[id^="amt"]');
+            for (var i = 0; i < cells.length; i++) {
+                total += parseFloat(cells[i].textContent) || 0;
+            }
+            var gst = total * 0.18;
+            var grand = total + gst;
+            document.getElementById('totalAmount').textContent = '\u20b9' + total.toFixed(2);
+            document.getElementById('gstAmount').textContent = '\u20b9' + gst.toFixed(2);
+            document.getElementById('grandTotal').textContent = '\u20b9' + grand.toFixed(2);
+        }
+
+        async function saveBill() {
+            var name = document.getElementById('customerName').value.trim();
+            if (!name) { showToast('Please enter customer name.', true); document.getElementById('customerName').focus(); return; }
+
+            var items = [];
+            var rows = document.querySelectorAll('#billBody tr');
+            var err = false;
+            rows.forEach(function(row) {
+                var id = row.id.replace('row', '');
+                var sel = document.getElementById('prod' + id);
+                var qty = parseInt(document.getElementById('qty' + id).value) || 0;
+                if (!sel || !sel.value || qty <= 0) { err = true; return; }
+                var opt = sel.options[sel.selectedIndex];
+                items.push({
+                    ProductId: parseInt(sel.value),
+                    ProductName: opt.text.trim(),
+                    Quantity: qty,
+                    UnitPrice: parseFloat(opt.getAttribute('data-price')) || 0,
+                    LineTotal: parseFloat(document.getElementById('amt' + id).textContent) || 0
+                });
+            });
+
+            if (err || items.length === 0) { showToast('Please select a product and valid quantity.', true); return; }
+
+            var payload = {
+                CustomerName: name,
+                CustomerContact: document.getElementById('customerContact').value.trim(),
+                Remarks: document.getElementById('remarks').value.trim(),
+                Items: items
+            };
+
+            var btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                var res = await fetch('/Agent/GenerateBill', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    var data = await res.json();
+                    if (data.redirectUrl) {
+                        showToast('Bill saved!', false);
+                        setTimeout(function() { window.location.href = data.redirectUrl; }, 600);
+                    }
+                } else {
+                    showToast('Failed to save. Try again.', true);
+                    btn.disabled = false;
+                    btn.textContent = 'Save Bill';
+                }
+            } catch (e) {
+                showToast('Error: ' + e.message, true);
+                btn.disabled = false;
+                btn.textContent = 'Save Bill';
+            }
+        }
+
+        function showToast(msg, isErr) {
+            var t = document.getElementById('inv-toast');
+            t.textContent = msg;
+            t.style.background = isErr ? '#dc2626' : '#057a55';
+            t.style.display = 'block';
+            setTimeout(function() { t.style.display = 'none'; }, 3000);
+        }
+
+        loadProducts();
+    </script>
+}

@@ -18,51 +18,56 @@ namespace BillingSystem.Web.Controllers
             _mediator = mediator;
         }
 
-        // GET: /Agent/GenerateBill
-        public async Task<IActionResult> GenerateBill()
+        // GET: /Agent/GenerateBill → redirects directly to Invoice page
+        public IActionResult GenerateBill()
         {
-            var products = await _mediator
-                .Send(new GetProductsQuery());
-            return View(products);
+            return RedirectToAction("Invoice");
         }
 
-        // POST: /Agent/GenerateBill
+        // POST: /Agent/GenerateBill → saves bill then shows invoice
         [HttpPost]
-        public async Task<IActionResult> GenerateBill(
-            CreateBillDto model)
+        public async Task<IActionResult> GenerateBill(CreateBillDto model)
         {
-            model.AgentId = User.FindFirstValue(
-                ClaimTypes.NameIdentifier)
+            model.AgentId = User.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? string.Empty;
+            model.CreatedBy = User.FindFirstValue(ClaimTypes.Email)
+                ?? "System";
 
-            model.CreatedBy = User.FindFirstValue(
-                ClaimTypes.Email) ?? "System";
-
-            var invoiceId = await _mediator.Send(
-                new GenerateBillCommand
-                {
-                    BillDto = model
-                });
+            var invoiceId = await _mediator.Send(new GenerateBillCommand
+            {
+                BillDto = model
+            });
 
             if (invoiceId > 0)
-                return RedirectToAction(
-                    "Invoice", new { id = invoiceId });
+                return RedirectToAction("Invoice", new { id = invoiceId });
 
-            ModelState.AddModelError("",
-                "Failed to generate bill");
-            return RedirectToAction("GenerateBill");
+            ModelState.AddModelError("", "Failed to generate bill");
+            return RedirectToAction("Invoice");
         }
 
-        // GET: /Agent/Invoice/5
-        public async Task<IActionResult> Invoice(int id)
+        // GET: /Agent/Invoice      → blank new invoice with dropdowns
+        // GET: /Agent/Invoice/5    → saved invoice view
+        public async Task<IActionResult> Invoice(int? id = null)
         {
-            var invoice = await _mediator
-                .Send(new GetInvoiceQuery
+            if (id.HasValue && id > 0)
+            {
+                var invoice = await _mediator.Send(new GetInvoiceQuery
                 {
-                    InvoiceId = id
+                    InvoiceId = id.Value
                 });
+                return View(invoice);
+            }
 
-            return View(invoice);
+            // New blank invoice
+            return View();
+        }
+
+        // GET: /Agent/GetProducts → returns JSON for dropdown
+        [HttpGet]
+        public async Task<IActionResult> GetProducts()
+        {
+            var products = await _mediator.Send(new GetProductsQuery());
+            return Json(products);
         }
     }
 }

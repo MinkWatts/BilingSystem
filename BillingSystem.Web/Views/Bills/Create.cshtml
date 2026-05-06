@@ -29,7 +29,7 @@
         color: var(--primary);
     }
 
-    /* ── Step 1: Product Selection ── */
+    
     .card {
         background: var(--white);
         border-radius: 10px;
@@ -79,7 +79,7 @@
             width: 140px;
         }
 
-        /* custom checkbox */
+     
         .prod-table input[type="checkbox"] {
             width: 18px;
             height: 18px;
@@ -108,7 +108,7 @@
             cursor: not-allowed;
         }
 
-    /* ── Generate Bill button (step 1) ── */
+
     .btn-generate {
         background: var(--accent);
         color: var(--white);
@@ -126,7 +126,7 @@
             opacity: 0.88;
         }
 
-    /* ── Step 2: Bill Form (hidden until Generate Bill clicked) ── */
+    
     #billFormSection {
         display: none;
         margin-top: 32px;
@@ -224,7 +224,6 @@
         min-height: 58px;
     }
 
-    /* ── Selected items table (read-only in step 2) ── */
     .items-table {
         width: 100%;
         border-collapse: collapse;
@@ -259,7 +258,7 @@
         color: var(--primary);
     }
 
-    /* ── Totals ── */
+ 
     .totals-box {
         margin-left: auto;
         width: 300px;
@@ -351,9 +350,6 @@
     }
 </style>
 
-<!-- ═══════════════════════════════════════════════
-     STEP 1 — Product Selection
-════════════════════════════════════════════════ -->
 <div id="productSelectSection" class="container">
     <div class="page-title">Generate Bill</div>
 
@@ -399,9 +395,7 @@
 </div>
 
 
-<!-- ═══════════════════════════════════════════════
-     STEP 2 — Bill Form (shown after Generate Bill)
-════════════════════════════════════════════════ -->
+
 <div id="billFormSection" class="container">
     <div class="bill-wrapper">
 
@@ -422,7 +416,7 @@
 
             <div class="bill-body">
 
-                <!-- Customer Details -->
+             
                 <div class="meta-grid">
                     <div class="form-group">
                         <label>Bill Date</label>
@@ -452,7 +446,7 @@
                     </div>
                 </div>
 
-                <!-- Selected Items (read-only display + hidden inputs) -->
+                
                 <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:10px;">
                     Bill Items
                 </div>
@@ -467,14 +461,14 @@
                         </tr>
                     </thead>
                     <tbody id="billItemsBody">
-                        <!-- Filled by JS from selected products -->
+                       
                     </tbody>
                 </table>
 
-                <!-- Hidden inputs posted to controller -->
+           
                 <div id="hiddenInputs"></div>
 
-                <!-- Totals -->
+              
                 <div class="totals-box">
                     <div class="totals-row">
                         <span class="lbl">Total Amount</span>
@@ -517,7 +511,7 @@
     <script>
         const TAX = 0.18;
 
-        // Enable/disable qty input when checkbox toggled
+        
         function toggleQty(cb) {
             const row = cb.closest('tr');
             const qtyInput = row.querySelector('.qty-input');
@@ -525,7 +519,7 @@
             if (cb.checked) qtyInput.focus();
         }
 
-        // Called when "Generate Bill" is clicked
+     
         function showBillForm() {
             const checked = document.querySelectorAll('.prod-check:checked');
             if (checked.length === 0) {
@@ -548,7 +542,6 @@
                 const amt   = qty * price;
                 total += amt;
 
-                // Display row
                 tbody.innerHTML += `
                     <tr>
                         <td>${cb.dataset.name}</td>
@@ -558,7 +551,6 @@
                         <td class="td-right">₹${amt.toFixed(2)}</td>
                     </tr>`;
 
-                // Hidden inputs for form POST
                 hiddenInputs.innerHTML += `
                     <input type="hidden" name="BillItems[${idx}].ProductId"   value="${cb.dataset.id}" />
                     <input type="hidden" name="BillItems[${idx}].ProductName" value="${cb.dataset.name}" />
@@ -577,7 +569,6 @@
             document.getElementById('hidTax').value   = tax.toFixed(2);
         ``    document.getElementById('hidGrand').value = grand.toFixed(2);
 
-            // Show bill form, hide product selection
             document.getElementById('productSelectSection').style.display = 'none';
             document.getElementById('billFormSection').style.display      = 'block';
         }
