@@ -1,0 +1,64 @@
+﻿@model BillingSystem.Models.ViewModels.RecentBillViewModel
+
+@{
+    ViewData["Title"] = "Bill Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Invoice #@Model.Id</h4>
+            <button onclick="window.print()" class="btn btn-light btn-sm">
+                <i class="bi bi-printer"></i> Print Invoice
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <h6 class="mb-3">From:</h6>
+                    <div><strong>Billing System Admin</strong></div>
+                    <div>Email: support@billingsystem.com</div>
+                </div>
+                <div class="col-sm-6 text-end">
+                    <h6 class="mb-3">Details:</h6>
+                    <div>Date: @Model.CreatedDate.ToString("dd MMM yyyy")</div>
+                    <div>Status: <span class="badge bg-success">Paid</span></div>
+                </div>
+            </div>
+
+            <div class="table-responsive-sm">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Bill Settlement for ID #@Model.Id</td>
+                            <td class="text-end">₹@Model.TotalAmount</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row justify-content-end">
+                <div class="col-lg-4 col-sm-5">
+                    <table class="table table-clear">
+                        <tbody>
+                            <tr>
+                                <td><strong>Total Amount</strong></td>
+                                <td class="text-end"><strong>₹@Model.TotalAmount</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <a asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+</div>

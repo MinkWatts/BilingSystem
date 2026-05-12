@@ -1,0 +1,113 @@
+﻿@model BillingSystem.Models.DTOs.CreateProductDto
+@{
+    ViewData["Title"] = "Add Product";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow p-4">
+
+            <h4 class="mb-4">Add New Product</h4>
+
+            <form asp-controller="Admin"
+                  asp-action="AddProduct"
+                  method="post">
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Product Name
+                    </label>
+                    <input asp-for="Name"
+                           class="form-control"
+                           placeholder="Enter name" />
+                    <span asp-validation-for="Name"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Price
+                    </label>
+                    <input asp-for="Price"
+                           type="number"
+                           step="0.01"
+                           class="form-control"
+                           placeholder="Enter price" />
+                    <span asp-validation-for="Price"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        SubCategory
+                    </label>
+                    <select asp-for="SubCategoryId"
+                            class="form-select">
+                        <option value="0">
+                            Select SubCategory
+                        </option>
+                        @{
+                            var catList = ViewBag.Categories
+                            as List<BillingSystem
+                            .Models.DTOs.CategoryDto>;
+
+                            if (catList != null)
+                            {
+                                foreach (var cat in catList)
+                                {
+                                    var catName = cat.Name;
+                                    var subs = cat.SubCategories;
+
+                                    if (subs != null
+                                    && subs.Count > 0)
+                                    {
+                                        <optgroup label="@catName">
+                                            @foreach (var sub
+                                                                        in subs)
+                                            {
+                                                var subId = sub.Id;
+                                                var subName =
+                                                sub.Name;
+                                                <option value="@subId">
+                                                    @subName
+                                                </option>
+                                            }
+                                        </optgroup>
+                                    }
+                                }
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="SubCategoryId"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                @Html.ValidationSummary(false, "",
+                new { @class = "text-danger" })
+
+                <button type="submit"
+                        class="btn btn-success w-100">
+                    Add Product
+                </button>
+
+                <a asp-controller="Admin"
+                   asp-action="Products"
+                   class="btn btn-secondary w-100 mt-2">
+                    Cancel
+                </a>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial");
+    }
+}

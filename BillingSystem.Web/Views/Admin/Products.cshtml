@@ -1,0 +1,158 @@
+﻿@model List<BillingSystem.Models.DTOs.ProductDto>
+
+@{
+    ViewData["Title"] = "Products";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between
+            align-items-center mb-4">
+    <h4>All Products</h4>
+    <a asp-controller="Admin"
+       asp-action="AddProduct"
+       class="btn btn-primary">
+        + Add New Product
+    </a>
+</div>
+
+<div class="card shadow p-3">
+    <table id="productsTable"
+           class="table table-bordered
+                  table-hover table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>SubCategory</th>
+                <th>Status</th>
+                <th>Created By</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int sr = 1;
+                foreach (var product in Model)
+                {
+                    var pId = product.Id;
+                    var pName = product.Name;
+                    var pPrice = product.Price;
+                    var pSub = product.SubCategoryName;
+                    var pActive = product.IsActive;
+                    var pBy = product.CreatedBy;
+                    var pDate = product.CreatedDate
+                    .ToString("dd MMM yyyy");
+
+                    <tr>
+                        <td>@sr</td>
+                        <td>@pName</td>
+                        <td>₹@pPrice</td>
+                        <td>@pSub</td>
+                        <td>
+                            @if (pActive)
+                            {
+                                <span class="badge bg-success">
+                                    Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    Inactive
+                                </span>
+                            }
+                        </td>
+                        <td>@pBy</td>
+                        <td>@pDate</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="confirmDelete(
+                                                @pId, '@pName')">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    sr++;
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<div class="modal fade"
+     id="deleteModal"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header
+                        bg-danger text-white">
+                <h5 class="modal-title">
+                    Confirm Delete
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div style="font-size:48px">⚠️</div>
+                <h5 class="mt-3">Are you sure?</h5>
+                <p class="text-muted">
+                    You are about to delete:
+                    <br />
+                    <strong id="productNameDisplay">
+                    </strong>
+                </p>
+                <p class="text-danger small">
+                    This action cannot be undone!
+                </p>
+            </div>
+            <div class="modal-footer
+                        justify-content-center">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <a id="confirmDeleteBtn"
+                   href="#"
+                   class="btn btn-danger">
+                    Yes Delete It!
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#productsTable').DataTable({
+                pageLength: 10,
+                language: {
+                    search: "Search Products:",
+                    lengthMenu: "Show _MENU_ products"
+                }
+            });
+        });
+
+        function confirmDelete(id, name) {
+            document.getElementById(
+                'productNameDisplay')
+                .innerText = name;
+
+            document.getElementById(
+                'confirmDeleteBtn').href =
+                '/Admin/DeleteProduct/' + id;
+
+            var modal = new bootstrap.Modal(
+                document.getElementById(
+                    'deleteModal'));
+            modal.show();
+        }
+    </script>
+}

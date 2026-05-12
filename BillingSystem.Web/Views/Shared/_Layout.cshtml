@@ -1,0 +1,382 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Billing System</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <style>
+        /* ── Feature 6: CSS Variables for Dark Mode ── */
+        :root {
+            --bg-body: #f4f6f9;
+            --bg-card: #ffffff;
+            --bg-navbar: linear-gradient(90deg, #1f1f1f, #343a40);
+            --text-primary: #212529;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --table-stripe: #f8f9fa;
+            --input-bg: #ffffff;
+            --input-border: #ced4da;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-navbar: linear-gradient(90deg, #0f172a, #1e293b);
+            --text-primary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --table-stripe: #1a2744;
+            --input-bg: #1e293b;
+            --input-border: #334155;
+            --shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Dark mode card overrides */
+        [data-theme="dark"] .card {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .table {
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: var(--table-stripe);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .table-hover > tbody > tr:hover > * {
+            background-color: #263352;
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .table thead.table-dark th {
+            background-color: #0f172a;
+        }
+
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] .form-select {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .modal-content {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .modal-header,
+        [data-theme="dark"] .modal-footer {
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        [data-theme="dark"] .bg-light {
+            background-color: #1e293b !important;
+        }
+
+        [data-theme="dark"] .bg-white {
+            background-color: var(--bg-card) !important;
+        }
+
+        [data-theme="dark"] .border {
+            border-color: var(--border-color) !important;
+        }
+
+        [data-theme="dark"] .dataTables_wrapper .dataTables_filter input,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_length select {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .dataTables_wrapper .dataTables_info,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button {
+            color: var(--text-primary) !important;
+        }
+
+        [data-theme="dark"] .page-link {
+            background-color: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--bg-navbar);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .nav-link {
+            color: #ddd !important;
+        }
+
+        .nav-link:hover {
+            color: #ffc107 !important;
+        }
+
+        /* Dark mode toggle button */
+        .dark-toggle {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.3);
+            color: #fff;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dark-toggle:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #ffc107;
+            color: #ffc107;
+        }
+
+        /* ── Feature 7: Print-Friendly Styles ── */
+        @@media print {
+            /* Hide all non-essential elements */
+            .navbar,
+            footer,
+            .no-print,
+            .btn,
+            .dark-toggle,
+            .dataTables_wrapper .dataTables_filter,
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_info,
+            .dataTables_wrapper .dataTables_paginate {
+                display: none !important;
+            }
+
+            body {
+                background: #fff !important;
+                color: #000 !important;
+                font-size: 11pt;
+            }
+
+            .container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .card {
+                border: 1px solid #ccc !important;
+                box-shadow: none !important;
+                break-inside: avoid;
+            }
+
+            .table {
+                font-size: 10pt;
+            }
+
+            .table thead.table-dark th {
+                background-color: #333 !important;
+                color: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .badge {
+                border: 1px solid #999;
+                color: #000 !important;
+                background: transparent !important;
+            }
+
+            h4, h5 {
+                color: #000 !important;
+            }
+
+            /* Print header */
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #333;
+                padding-bottom: 10px;
+            }
+
+            .print-header h2 {
+                font-size: 18pt;
+                margin: 0;
+            }
+
+            .print-header p {
+                font-size: 10pt;
+                color: #555;
+                margin: 4px 0 0;
+            }
+        }
+
+        /* Print header hidden on screen */
+        .print-header {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+
+            <a class="navbar-brand" href="#">
+                💼 Billing System
+            </a>
+
+            <div class="navbar-nav ms-auto d-flex flex-row align-items-center gap-2">
+
+                @if (User.Identity!.IsAuthenticated)
+                {
+                    <span class="text-light me-1 d-none d-md-inline">
+                        @User.Identity.Name
+                    </span>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                        <a class="nav-link" asp-controller="Admin" asp-action="Users">
+                            <i class="fas fa-users"></i> Users
+                        </a>
+                        <a class="nav-link" asp-controller="Admin" asp-action="Categories">
+                            <i class="fas fa-layer-group"></i> Categories
+                        </a>
+                        <a class="nav-link" asp-controller="Admin" asp-action="Products">
+                            <i class="fas fa-box"></i> Products
+                        </a>
+                    }
+
+                    @if (User.IsInRole("Agent"))
+                    {
+                        <a class="nav-link" asp-controller="Agent" asp-action="GenerateBill">
+                            <i class="fas fa-file-invoice"></i> Generate Bill
+                        </a>
+                    }
+
+                    @* Feature 6: Dark Mode Toggle *@
+                    <button class="dark-toggle no-print" id="darkToggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                        <span id="darkIcon">🌙</span>
+                        <span id="darkLabel">Dark</span>
+                    </button>
+
+                    <!-- Logout button -->
+                    <button type="button"
+                            class="btn btn-outline-light btn-sm no-print"
+                            data-bs-toggle="modal"
+                            data-bs-target="#logoutModal">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+
+                    <!-- Logout Confirmation Modal -->
+                    <div class="modal fade" id="logoutModal" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Confirm Logout</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to logout?
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger">Logout</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 mb-5">
+        @* Feature 7: Print header (only visible when printing) *@
+        <div class="print-header">
+            <h2>💼 Billing System</h2>
+            <p>Printed on @DateTime.Now.ToString("dd MMM yyyy, hh:mm tt")</p>
+        </div>
+
+        @RenderBody()
+    </div>
+
+    <footer class="text-center no-print">
+        <hr />
+        <p>© 2026 Billing System | Developed by Mink Watts</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        // Feature 6: Dark Mode Toggle with localStorage persistence
+        (function () {
+            var saved = localStorage.getItem('billingTheme') || 'light';
+            applyTheme(saved);
+        })();
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            var icon = document.getElementById('darkIcon');
+            var label = document.getElementById('darkLabel');
+            if (icon && label) {
+                if (theme === 'dark') {
+                    icon.textContent = '☀️';
+                    label.textContent = 'Light';
+                } else {
+                    icon.textContent = '🌙';
+                    label.textContent = 'Dark';
+                }
+            }
+        }
+
+        function toggleDarkMode() {
+            var current = document.documentElement.getAttribute('data-theme') || 'light';
+            var next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('billingTheme', next);
+            applyTheme(next);
+        }
+    </script>
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>
